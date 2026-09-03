@@ -4,7 +4,7 @@ This project follows the [OpenTelemetry Generative AI Contribution Policy][otel-
 Read and understand that document first — it is the canonical reference for all OpenTelemetry
 repositories.
 
-The sections below add project-specific guidance for `opentelemetry-go-compile-instrumentation`.
+The sections below add project-specific guidance for `opentelemetry-go-compile-contrib`.
 
 ## The Critical Rule
 

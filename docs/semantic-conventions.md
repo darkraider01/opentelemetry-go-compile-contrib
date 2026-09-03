@@ -6,7 +6,7 @@ This document describes the tooling and workflow for managing [OpenTelemetry Sem
 
 Semantic conventions define a common set of attribute names and values used across OpenTelemetry projects to ensure consistency and interoperability. This project uses [OTel Weaver](https://github.com/open-telemetry/weaver) to:
 
-1. **Validate the project's own telemetry contract** — a local Weaver registry under [`schemas/otelc/`](../schemas/otelc/) declares exactly which metrics, spans, and attributes each instrumentation emits, and CI validates it against the pinned upstream semantic conventions. This is the primary integration and is described in [Local Registry](#local-registry-schemasotelc) below.
+1. **Validate the project's own telemetry contract** — a local Weaver registry under [`schemas/otelc-contrib/`](../schemas/otelc-contrib/) declares exactly which metrics, spans, and attributes each instrumentation emits, and CI validates it against the pinned upstream semantic conventions. This is the primary integration and is described in [Local Registry](#local-registry-schemasotelc-contrib) below.
 2. **Track upstream changes** — the `.semconv-version` file pins the upstream version the project abides by, and helper targets report what's new upstream.
 
 Weaver runs from an OCI image (`otel/weaver`) via Docker/Podman for the registry validation, so no host install is required for `make lint-schema`.
@@ -28,19 +28,19 @@ v1.30.0
 When updating to a new semantic conventions version:
 
 1. Update the version in `.semconv-version`
-2. Update the upstream dependency in `schemas/otelc/registry_manifest.yaml` (the `.deps/upstream-vX.Y.Z[model]` path) to match
+2. Update the upstream dependency in `schemas/otelc-contrib/registry_manifest.yaml` (the `.deps/upstream-vX.Y.Z[model]` path) to match
 3. Update Go imports in `instrumentation/**/semconv/` to match
 4. Run `make lint-schema` to validate
 5. Update code and registry groups to handle any breaking changes
 
 > The `.semconv-version` file, the `registry_manifest.yaml` dependency, and the Go `semconv/vX.Y.Z` imports must all agree. CI enforces this consistency.
 
-## Local Registry (`schemas/otelc/`)
+## Local Registry (`schemas/otelc-contrib/`)
 
-The project maintains its own Weaver schema registry under [`schemas/otelc/`](../schemas/otelc/) that is the machine-readable contract of the telemetry otelc's instrumentations emit:
+The project maintains its own Weaver schema registry under [`schemas/otelc-contrib/`](../schemas/otelc-contrib/) that is the machine-readable contract of the telemetry otelc's instrumentations emit:
 
 ```
-schemas/otelc/
+schemas/otelc-contrib/
 ├── registry_manifest.yaml   # registry metadata + pinned upstream semconv dependency
 ├── groups/                  # one file per instrumentation (metrics, spans, attributes)
 │   ├── http.yaml            # net/http client & server metrics
@@ -59,7 +59,7 @@ schemas/otelc/
 └── .deps/                   # pre-fetched upstream semconv (git-ignored, generated)
 ```
 
-Every instrumentation module in `instrumentation/` maps to exactly one file here — see the [coverage table](../schemas/otelc/README.md#instrumentation-coverage). Instrumentations that emit no telemetry of their own still get a file, with `groups: []` and a comment explaining why.
+Every instrumentation module in `instrumentation/` maps to exactly one file here — see the [coverage table](../schemas/otelc-contrib/README.md#instrumentation-coverage). Instrumentations that emit no telemetry of their own still get a file, with `groups: []` and a comment explaining why.
 
 - `registry_manifest.yaml` declares the registry name and a **dependency** on the upstream OpenTelemetry semantic conventions, pre-fetched locally under `.deps/` so weaver doesn't clone it over the network on every run.
 - Each `groups/*.yaml` file declares the metrics/spans/attributes one instrumentation produces. Telemetry that exists **upstream** is referenced with `ref:`; telemetry that is **specific to a library** (not covered upstream) is declared locally with `id:`.
@@ -68,7 +68,7 @@ Every instrumentation module in `instrumentation/` maps to exactly one file here
 
 Use `groups/http.yaml` as the template:
 
-1. Create `schemas/otelc/groups/<library>.yaml`.
+1. Create `schemas/otelc-contrib/groups/<library>.yaml`.
 2. For each metric your instrumentation records (see its `instrumentation/**/semconv/*.go`), add a `type: metric` group with `metric_name`, `instrument`, `unit`, `stability`, and its attribute set.
 3. For each span your instrumentation creates, add a `type: span` group with `span_kind`, `stability`, `brief`, and its attribute set (see `groups/grpc.yaml`, `groups/database-sql.yaml`). List the union of all attributes the span may carry, including those set only conditionally.
 4. Reference upstream attributes with `- ref: <attribute.id>`. For attributes/metrics not defined upstream, declare them locally with `id:` (include `type`, `stability`, `brief`, and `examples` for string attributes — `--future` treats a missing example as an error). Group local attribute definitions in a `type: attribute_group` so several groups can `ref:` them (see `groups/k8s.yaml`, `groups/openai.yaml`).
@@ -95,7 +95,7 @@ This installs the weaver CLI tool to `$GOPATH/bin`. Ensure your `$GOPATH/bin` is
 
 ### Validate the Local Registry
 
-Validate the project's own telemetry contract in `schemas/otelc/`:
+Validate the project's own telemetry contract in `schemas/otelc-contrib/`:
 
 ```bash
 make lint-schema           # or the umbrella alias: make lint/semantic-conventions
@@ -103,13 +103,13 @@ make lint-schema           # or the umbrella alias: make lint/semantic-conventio
 
 This command:
 
-- Pre-fetches the pinned upstream semconv into `schemas/otelc/.deps/` (via `make fetch-upstream-semconv`)
+- Pre-fetches the pinned upstream semconv into `schemas/otelc-contrib/.deps/` (via `make fetch-upstream-semconv`)
 - Asserts the manifest's upstream dependency matches `.semconv-version`
-- Runs `weaver registry check --future` (from the `otel/weaver` OCI image) against `schemas/otelc/`
+- Runs `weaver registry check --future` (from the `otel/weaver` OCI image) against `schemas/otelc-contrib/`
 - Filters weaver's diagnostics through `scripts/semconv/lint-schema-filter.jq`, failing on any diagnostic that is not the expected upstream-metric duplicate
 - **This check is blocking** — violations will fail CI
 
-**When to use**: Run this before committing changes to `schemas/otelc/**`, `instrumentation/**/semconv/`, or `.semconv-version`.
+**When to use**: Run this before committing changes to `schemas/otelc-contrib/**`, `instrumentation/**/semconv/`, or `.semconv-version`.
 
 ### Generate Registry Diff
 
@@ -299,15 +299,15 @@ When you modify files in `schemas/**`, `scripts/semconv/**`, `instrumentation/**
 This job ensures the registry and code stay consistent with the pinned version:
 
 1. **Read Version**: Reads the version from `.semconv-version` file
-2. **Validate Manifest Consistency**: Checks that the upstream dependency in `schemas/otelc/registry_manifest.yaml` matches `.semconv-version`
+2. **Validate Manifest Consistency**: Checks that the upstream dependency in `schemas/otelc-contrib/registry_manifest.yaml` matches `.semconv-version`
 3. **Validate Code Consistency**: Checks that Go imports in `instrumentation/**/semconv/` match the version in `.semconv-version`
-4. **Registry Validation**: Runs `make lint-schema` to validate `schemas/otelc/` with weaver
+4. **Registry Validation**: Runs `make lint-schema` to validate `schemas/otelc-contrib/` with weaver
    - **This check is blocking** - violations will fail the PR
 
 **What This Checks**:
 
 - `.semconv-version`, the registry manifest dependency, and the `semconv` imports in Go code all agree
-- The `schemas/otelc/` registry is valid against the pinned upstream semconv (no unexpected weaver diagnostics)
+- The `schemas/otelc-contrib/` registry is valid against the pinned upstream semconv (no unexpected weaver diagnostics)
 
 #### Job 2: Check Available Updates (Non-blocking)
 
@@ -331,13 +331,13 @@ This job shows what's new in the latest semantic conventions:
 When changes are merged to `main`:
 
 1. **Read Version**: Reads the version from `.semconv-version`
-2. **Registry Validation**: Runs `make lint-schema` to ensure the `schemas/otelc/` registry stays valid
+2. **Registry Validation**: Runs `make lint-schema` to ensure the `schemas/otelc-contrib/` registry stays valid
 
 ### How It Works
 
 The CI workflow uses the Make targets defined in the Makefile:
 
-- `make lint-schema`: Validates the `schemas/otelc/` registry with weaver via Docker (blocking check)
+- `make lint-schema`: Validates the `schemas/otelc-contrib/` registry with weaver via Docker (blocking check)
 - `make semantic-conventions/diff`: Generates upstream diff report (non-blocking check; uses `make weaver-install`)
 
 This approach:
@@ -359,7 +359,7 @@ Consider updating your `semconv` version when:
 1. Review the "Available Updates" diff
 2. Update Go imports in `instrumentation/**/semconv/`: `semconv/v1.30.0` → `semconv/v1.31.0`
 3. Update the version in `.semconv-version` file
-4. Update the upstream dependency in `schemas/otelc/registry_manifest.yaml` to match
+4. Update the upstream dependency in `schemas/otelc-contrib/registry_manifest.yaml` to match
 5. Update code to handle any breaking changes
 6. Run `make lint-schema` to validate the new version
 7. Run tests: `make test`
@@ -439,6 +439,6 @@ If the diff report shows changes you didn't make:
 
 If you encounter issues with semantic conventions tooling:
 
-1. Check the [GitHub Issues](https://github.com/open-telemetry/opentelemetry-go-compile-instrumentation/issues)
+1. Check the [GitHub Issues](https://github.com/open-telemetry/opentelemetry-go-compile-contrib/issues)
 2. Ask in the [#otel-go-compile-instrumentation](https://cloud-native.slack.com/archives/C088D8GSSSF) Slack channel
 3. Open a new issue with details about your problem

@@ -1,7 +1,7 @@
 # AGENTS.md
 
 This file provides guidelines for AI-assisted contributions to
-`opentelemetry-go-compile-instrumentation`. For the project's AI usage policy, see
+`opentelemetry-go-compile-contrib`. For the project's AI usage policy, see
 [docs/AI_POLICY.md](docs/AI_POLICY.md).
 
 ## General Rules and Guidelines

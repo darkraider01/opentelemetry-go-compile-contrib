@@ -48,11 +48,11 @@ GOVULNCHECK_CORE_MODULES := . $(shell find pkg -type f -name 'go.mod' -exec dirn
 GOVULNCHECK_TEST_APPS := $(shell find test/apps -mindepth 1 -maxdepth 1 -type d | sort)
 
 # OTel Weaver execution for the local semantic-convention registry under
-# schemas/otelc/. Weaver runs from an OCI image (no host install required);
+# schemas/otelc-contrib/. Weaver runs from an OCI image (no host install required);
 # override OCI_BIN=podman or WEAVER_IMAGE=... to use a different runtime/version.
 OCI_BIN ?= docker
 WEAVER_IMAGE ?= otel/weaver:v0.19.0
-OTELC_REGISTRY_DIR = $(CURDIR)/schemas/otelc
+OTELC_REGISTRY_DIR = $(CURDIR)/schemas/otelc-contrib
 
 ##@ Tooling
 
@@ -112,7 +112,7 @@ GOOS ?= $(shell go env GOOS)
 VERSION := $(shell git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
 COMMIT_HASH := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 BUILD_TIME := $(shell date -u '+%Y-%m-%d')
-MODULE_PATH = go.opentelemetry.io/otelc
+MODULE_PATH = go.opentelemetry.io/otelc-contrib
 LDFLAGS := -X $(MODULE_PATH)/tool/util.Version=$(VERSION) -X $(MODULE_PATH)/tool/util.CommitHash=$(COMMIT_HASH) -X $(MODULE_PATH)/tool/util.BuildTime=$(BUILD_TIME)
 GO_BUILD_CMD := go build -trimpath -a -ldflags "$(LDFLAGS)"
 ALL_GO_MOD_DIRS := $(shell find . -type f -name 'go.mod' -exec dirname {} \; | sort)
@@ -125,7 +125,7 @@ endif
 
 .PHONY: help
 help: ## Show this help message
-	@echo -e "\033[1;3;34mOpenTelemetry Go Compile Instrumentation.\033[0m\n"
+	@echo -e "\033[1;3;34mOpenTelemetry Go Compile Contrib.\033[0m\n"
 	@echo 'Usage: make [target]'
 	@echo ''
 	@echo 'Targets:'
@@ -252,11 +252,11 @@ format/go: $(GOLANGCI_LINT)
 	@echo "Formatting Go code..."
 	$(GOLANGCI_LINT) fmt --config .tools/golangci.yml
 
-format/yaml: ## Format YAML files only (excludes testdata and schemas/otelc/.deps)
+format/yaml: ## Format YAML files only (excludes testdata and schemas/otelc-contrib/.deps)
 format/yaml: $(YAMLFMT)
 	@echo "Formatting YAML files..."
 	$(YAMLFMT) -conf .tools/yamlfmt -dstar \
-		-exclude '**/schemas/otelc/.deps/**' \
+		-exclude '**/schemas/otelc-contrib/.deps/**' \
 		-exclude '**/testdata/**' \
 		'**/*.yml' '**/*.yaml'
 
@@ -282,7 +282,7 @@ lint/yaml: ## Lint YAML formatting
 lint/yaml: $(YAMLFMT)
 	@echo "Linting YAML files..."
 	$(YAMLFMT) -conf .tools/yamlfmt -lint -dstar \
-		-exclude '**/schemas/otelc/.deps/**' \
+		-exclude '**/schemas/otelc-contrib/.deps/**' \
 		-exclude '**/testdata/**' \
 		'**/*.yml' '**/*.yaml'
 
@@ -894,16 +894,16 @@ weaver-install: ## Install OTel Weaver if not present
 # Semantic Conventions Validation Targets
 #
 # The project's telemetry contract lives in the local Weaver registry under
-# schemas/otelc/ (see docs/semantic-conventions.md). Weaver runs from an OCI
+# schemas/otelc-contrib/ (see docs/semantic-conventions.md). Weaver runs from an OCI
 # image ($(WEAVER_IMAGE)) via $(OCI_BIN), so no host install is required for
 # these targets.
 
-fetch-upstream-semconv: ## Pre-fetch the pinned upstream semconv registry into schemas/otelc/.deps/
+fetch-upstream-semconv: ## Pre-fetch the pinned upstream semconv registry into schemas/otelc-contrib/.deps/
 	@scripts/semconv/fetch-upstream-semconv.sh
 
-lint-schema: ## Validate the local semantic-convention registry (schemas/otelc/) with OTel Weaver
+lint-schema: ## Validate the local semantic-convention registry (schemas/otelc-contrib/) with OTel Weaver
 lint-schema: fetch-upstream-semconv
-	@echo "Validating otelc semantic-convention registry (schemas/otelc)..."
+	@echo "Validating otelc semantic-convention registry (schemas/otelc-contrib)..."
 	@# Guard: the upstream dependency pinned in the registry manifest must match .semconv-version.
 	@MANIFEST_VERSION=$$(grep -oE 'upstream-v[0-9]+\.[0-9]+\.[0-9]+' "$(OTELC_REGISTRY_DIR)/registry_manifest.yaml" | head -1 | sed -E 's/upstream-v//'); \
 	SEMCONV_VERSION=$$(grep -E '^v[0-9]+\.[0-9]+\.[0-9]+' .semconv-version | head -1 | tr -d '[:space:]' | sed 's/^v//'); \
@@ -920,7 +920,7 @@ lint-schema: fetch-upstream-semconv
 
 # `lint/semantic-conventions` is the umbrella entry point used by CI and the
 # top-level `lint` target; it now validates the project's own registry.
-lint/semantic-conventions: ## Validate the otelc semantic-convention registry (schemas/otelc/) with OTel Weaver
+lint/semantic-conventions: ## Validate the otelc semantic-convention registry (schemas/otelc-contrib/) with OTel Weaver
 lint/semantic-conventions: lint-schema
 
 semantic-conventions/diff: ## Generate diff between current version and latest (non-blocking informational check)

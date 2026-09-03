@@ -2,18 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 //go:build tools
-// +build tools
 
-package tools // import "go.opentelemetry.io/otelc/tools"
+// Package tools tracks tool dependencies used by the Makefile, so `go mod tidy`
+// keeps them pinned even though no non-test code imports them directly.
+package tools
 
 import (
-	_ "github.com/campoy/embedmd/v2"
 	_ "github.com/checkmake/checkmake/cmd/checkmake"
 	_ "github.com/golangci/golangci-lint/v2/cmd/golangci-lint"
 	_ "github.com/google/yamlfmt/cmd/yamlfmt"
-	_ "github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt"
 	_ "github.com/rhysd/actionlint/cmd/actionlint"
-	_ "github.com/sethvargo/ratchet"
-	_ "go.opentelemetry.io/build-tools/crosslink"
-	_ "golang.org/x/vuln/cmd/govulncheck"
 )
