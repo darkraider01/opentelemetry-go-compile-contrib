@@ -439,6 +439,6 @@ If the diff report shows changes you didn't make:
 
 If you encounter issues with semantic conventions tooling:
 
-1. Check the [GitHub Issues](https://github.com/open-telemetry/opentelemetry-go-compile-instrumentation/issues)
+1. Check the [GitHub Issues](https://github.com/open-telemetry/opentelemetry-go-compile-contrib/issues)
 2. Ask in the [#otel-go-compile-instrumentation](https://cloud-native.slack.com/archives/C088D8GSSSF) Slack channel
 3. Open a new issue with details about your problem

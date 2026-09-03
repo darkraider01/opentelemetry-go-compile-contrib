@@ -26,3 +26,7 @@ exclude:
   # Pre-fetched upstream semantic-conventions registry (generated, git-ignored).
   # Upstream k8s/registry.yaml is not always valid YAML; never format/lint it.
   - "**/schemas/otelc/.deps/**"
+  # Repo-scaffold workflows; kept byte-for-byte as generated, not reformatted.
+  - ".github/workflows/codeql.yml"
+  - ".github/workflows/scorecard.yml"
+  - ".github/workflows/zizmor.yml"

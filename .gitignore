@@ -1,5 +1,5 @@
 *.log
-opentelemetry-go-compile-instrumentation
+opentelemetry-go-compile-contrib
 /otelc
 /otelc.exe
 demo/basic/basic

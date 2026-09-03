@@ -1,4 +1,4 @@
-# Contributing to opentelemetry-go-compile-instrumentation
+# Contributing to opentelemetry-go-compile-contrib
 
 The go compile instrumentation SIG meets regularly. See the
 OpenTelemetry
@@ -35,8 +35,8 @@ This project uses several tools for development. Most tools will be automaticall
 1. Clone the repository:
 
    ```sh
-   git clone https://github.com/open-telemetry/opentelemetry-go-compile-instrumentation
-   cd opentelemetry-go-compile-instrumentation
+   git clone https://github.com/open-telemetry/opentelemetry-go-compile-contrib
+   cd opentelemetry-go-compile-contrib
    ```
 
 2. Configure the git merge driver for the instrumentation bundle (run once per clone):
@@ -305,23 +305,23 @@ Here are some examples for the various supported commit types:
 
 ### How to Send Pull Requests
 
-Everyone is welcome to contribute code to `opentelemetry-go-compile-instrumentation` via
+Everyone is welcome to contribute code to `opentelemetry-go-compile-contrib` via
 GitHub pull requests (PRs).
 
 To create a new PR, fork the project in GitHub and clone the upstream
 repo:
 
 ```sh
-git clone https://github.com/open-telemetry/opentelemetry-go-compile-instrumentation
+git clone https://github.com/open-telemetry/opentelemetry-go-compile-contrib
 ```
 
-This would put the project in the `opentelemetry-go-compile-instrumentation` directory in
+This would put the project in the `opentelemetry-go-compile-contrib` directory in
 current working directory.
 
 Enter the newly created directory and add your fork as a new remote:
 
 ```sh
-git remote add <YOUR_FORK> git@github.com:<YOUR_GITHUB_USERNAME>/opentelemetry-go-compile-instrumentation
+git remote add <YOUR_FORK> git@github.com:<YOUR_GITHUB_USERNAME>/opentelemetry-go-compile-contrib
 ```
 
 Check out a new branch, make modifications, run linters and tests, and push
@@ -335,7 +335,7 @@ git commit
 git push <YOUR_FORK> <YOUR_BRANCH_NAME>
 ```
 
-Open a pull request against the main `opentelemetry-go-compile-instrumentation` repo.
+Open a pull request against the main `opentelemetry-go-compile-contrib` repo.
 
 Avoid rebasing and force-pushing to your branch to facilitate reviewing the pull request.
 Rewriting Git history makes it difficult to keep track of iterations during code review.

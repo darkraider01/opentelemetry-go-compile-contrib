@@ -8,7 +8,7 @@ The OpenTelemetry project follows a coordinated vulnerability disclosure model.
 ### Preferred Method — GitHub Private Vulnerability Reporting
 
 Use GitHub's built-in
-[private vulnerability reporting](https://github.com/open-telemetry/opentelemetry-go-compile-instrumentation/security/advisories/new)
+[private vulnerability reporting](https://github.com/open-telemetry/opentelemetry-go-compile-contrib/security/advisories/new)
 feature to open a confidential security advisory directly in this repository.
 The maintainers will be notified and can begin triage without public exposure.
 
@@ -70,7 +70,7 @@ the following template to notify affected users via GitHub Releases, the
 mailing list, or the advisory itself.
 
 ```
-Subject: [Security Advisory] <CVE-ID or short title> in opentelemetry-go-compile-instrumentation
+Subject: [Security Advisory] <CVE-ID or short title> in opentelemetry-go-compile-contrib
 
 Severity: <Critical | High | Medium | Low>
 Affected versions: <e.g., < v0.5.1>

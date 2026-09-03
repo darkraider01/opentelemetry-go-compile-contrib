@@ -125,7 +125,7 @@ endif
 
 .PHONY: help
 help: ## Show this help message
-	@echo -e "\033[1;3;34mOpenTelemetry Go Compile Instrumentation.\033[0m\n"
+	@echo -e "\033[1;3;34mOpenTelemetry Go Compile Contrib.\033[0m\n"
 	@echo 'Usage: make [target]'
 	@echo ''
 	@echo 'Targets:'
