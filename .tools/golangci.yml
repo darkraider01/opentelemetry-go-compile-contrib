@@ -576,7 +576,7 @@ formatters:
       simplify: true
 
     gofumpt:
-      module-path: go.opentelemetry.io/otelc
+      module-path: go.opentelemetry.io/otelc-contrib
       extra-rules: true
 
     goimports:
@@ -584,7 +584,7 @@ formatters:
       # with the given prefixes are grouped after 3rd-party packages.
       # Default: []
       local-prefixes:
-        - github.com/kemal.akkoyun/opentelemetry-go-compile-instrumentation
+        - go.opentelemetry.io/otelc-contrib
 
     golines:
       # Target maximum line length.
